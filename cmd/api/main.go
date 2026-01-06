@@ -40,7 +40,7 @@ func main() {
 
 	connPostgres, err := connectPostgres(cfg, lg)
 	if err != nil {
-		logger.Error("ошибка подключения к базе данных", "err", err)
+		logger.Error("database connection error", "err", err)
 		return
 	}
 	c.Add(func(ctx context.Context) error {
@@ -62,7 +62,7 @@ func main() {
 	// Create and start server gRPC
 	serviceGrpc, err := newGrpcServer(cfg, []serviceGrpc.RegisterFunc{})
 	if err != nil {
-		logger.Error("ошибка запуска serviceGrpc", "err", err)
+		logger.Error("serviceGrpc startup error", "err", err)
 		return
 	}
 	c.Add(func(ctx context.Context) error {
@@ -88,9 +88,9 @@ func main() {
 	// Ждем сигнала или ошибки сервера
 	select {
 	case <-ctx.Done():
-		lg.Info("получен сигнал завершения работы")
+		lg.Info("shutdown signal has been received")
 	case err := <-errCh:
-		lg.Error("ошибка сервера", "err", err)
+		lg.Error("server error", "err", err)
 	}
 }
 
@@ -132,6 +132,6 @@ func shutdown(c *closer.Closer, lg *slog.Logger) {
 	defer cancel()
 
 	if err := c.Close(closeCtx); err != nil {
-		lg.Error("ошибка при закрытии ресурсов", "err", err)
+		lg.Error("error when closing resources", "err", err)
 	}
 }
